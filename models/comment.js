@@ -22,3 +22,5 @@ commentSchema.virtual('author').get(function() {
 commentSchema.virtual('author_avatar_url_64').get(function() {
   return this.user.avatar_url_64;
 });
+
+module.exports = commentSchema;
