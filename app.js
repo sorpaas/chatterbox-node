@@ -12,7 +12,7 @@ var databaseUrl = process.env.DATABASE_URL;
 var databaseCollections = ["sessions", "users", "groups", "topics", "comments", "notifications"];
 var db = mongo.connect(databaseUrl, databaseCollections);
 
-routes(app);
+routes(app, db);
 sockets(io);
 
 server.listen(runningPortNumber);
