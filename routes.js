@@ -81,4 +81,74 @@ module.exports = function(app, db) {
 
     db.groups.save({ name: req.body.name, description: req.body.description });
   });
+
+  app.get("/groups/:groupId", function(req, res){
+    db.groups.findOne({ _id: req.params.groupId }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      db.topics.find({ groupId: req.params.groupId }, function(err, topics){
+        if(err){
+          res.status(500);
+          return;
+        }
+
+        doc.topics = topics;
+        res.send(200, doc);
+      })
+    })
+  });
+
+  app.get("/groups/:groupId/members", function(req, res){
+    db.groups.findOne({ _id: req.params.groupId }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      function findUsersIterate(array, cur, users, callback) {
+        if(cur == array.length) {
+          callback(null, users);
+        }
+
+        db.users.findOne({ _id: array[cur] }, function(err, doc){
+          if(err) {
+            callback(err, null);
+            return;
+          }
+
+          users[cur] = doc;
+          findUsersIterate(array, cur + 1, users, callback);
+        });
+      }
+
+      findUsersIterate(doc.members, 0, [], function(err, users){
+        if(err){
+          res.status(500);
+          return;
+        }
+
+        res.send(200, users);
+      })
+    });
+  });
+
+  app.put("/groups/:groupId/members", function(req, res){
+    var userId = req.body.userId;
+
+    db.groups.findAndModify({
+      query: { _id: req.params.groupId },
+      update: { $addToSet: { members: userId } },
+      new: true
+    }, function(err) {
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.status(201);
+    });
+  });
 };
