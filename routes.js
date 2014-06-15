@@ -152,6 +152,25 @@ module.exports = function(app, db) {
     });
   });
 
+  app.delete("/groups/:groupId/members/:userId", function(req, res){
+    if(!(req.session.userId == req.params.userId)) {
+      res.status(403);
+      return;
+    }
+
+    db.groups.findAndModify({
+      query: { _id: req.params.groupId },
+      update: { $pull: { members: req.params.userId } }
+    }, function(err) {
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.status(204);
+    });
+  });
+
   app.get("/groups/:groupId/topics", function(req, res){
     db.topics.find({ groupId: req.params.groupId }, function(err, topics){
       if(err){
@@ -206,4 +225,6 @@ module.exports = function(app, db) {
       res.send(201);
     })
   });
+
+
 };
