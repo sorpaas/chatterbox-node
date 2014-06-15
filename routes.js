@@ -1,3 +1,5 @@
+var bodyParser = require('body-parser');
+
 module.exports = function(app, db) {
   app.configure(function(){
     // I need to access everything in '/public' directly
@@ -16,10 +18,18 @@ module.exports = function(app, db) {
     next();
   });
 
-  //parse session
+  // parse json body
+  app.use(bodyParser.json({ strict: false }));
+
+  // parse session
   app.use(function(req, res, next){
-    req.session = req.header("Session-Id")
-    next();
+    var sessionId = req.header("Session-Id");
+    db.sessions.findOne({_id: sessionId}, function(err, doc){
+      if(!err && doc) {
+        req.session = doc;
+      }
+      next();
+    });
   })
 
   app.get("/", function(req, res){
@@ -44,19 +54,11 @@ module.exports = function(app, db) {
   });
 
   app.get("/session", function(req, res){
-    db.sessions.findOne({_id: req.session}, function(err, doc){
-      if(err) {
-        res.status(500);
-        return;
-      }
-
-      if(!doc) {
-        res.status(403);
-        return;
-      }
-
-      res.send(200, doc)
-    });
+    if(req.session) {
+      res.send(200, doc);
+    } else {
+      res.status(403);
+    }
   });
 
   app.get("/groups", function(req, res){
@@ -68,5 +70,15 @@ module.exports = function(app, db) {
 
       res.send(200, doc.map(function(x) { return { _id: x._id, name: x.name, description: x.description }}))
     });
+  });
+
+  app.put("/groups", function(req, res){
+    //require log in
+    if(!req.session || !req.session.userId){
+      res.status(403);
+      return;
+    }
+
+    db.groups.save({ name: req.body.name, description: req.body.description });
   });
 };
