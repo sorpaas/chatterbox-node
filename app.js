@@ -13,6 +13,6 @@ var databaseCollections = ["sessions", "users", "groups", "topics", "comments", 
 var db = mongo.connect(databaseUrl, databaseCollections);
 
 routes(app, db);
-sockets(io);
+sockets(io, app, db);
 
 server.listen(runningPortNumber);
