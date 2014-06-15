@@ -226,5 +226,71 @@ module.exports = function(app, db) {
     })
   });
 
+  app.post("/session/user", function(req, res){
+    //TODO user login module, should get spec before implement
+    db.sessions.findAndModify({
+      query: { _id, req.session._id },
+      update: { $set: { userId, req.body.userId } }
+    }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
 
+      res.send(204);
+    })
+  })
+
+  app.put("/users", function(req, res){
+    db.users.save({
+      name: req.body.name,
+      avatar: req.body.avatar
+    }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      db.sessions.findAndModify({
+        query: { _id, req.session._id },
+        update: { $set: { userId, doc_id } }
+      }, function(err){
+        if(err){
+          res.status(500);
+          return;
+        }
+
+        res.send(201);
+      });
+    });
+  });
+
+  app.get("/users/:userId", function(req, res){
+    if(!(req.session.userId == req.params.userId)) {
+      res.status(403);
+      return;
+    }
+
+    db.users.find({ _id: req.params.userId }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.send(200, doc);
+    });
+  });
+
+  app.get("/users/:userId/groups", function(req, res){
+    db.groups.find({
+      members: { $elemMatch: req.params.userId }
+    }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.send(200, doc);
+    })
+  })
 };
