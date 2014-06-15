@@ -151,4 +151,59 @@ module.exports = function(app, db) {
       res.status(201);
     });
   });
+
+  app.get("/groups/:groupId/topics", function(req, res){
+    db.topics.find({ groupId: req.params.groupId }, function(err, topics){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.send(200, topics);
+    });
+  });
+
+  app.put("/groups/:groupId/topics", function(req, res){
+    db.topics.save({ title: req.body.title, description: req.body.description, groupId: req.params.groupId }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.send(201);
+    });
+  });
+
+  app.get("/groups/:groupId/topics/:topicId", function(req, res){
+    db.topics.findOne({ _id: req.body.topicId }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.send(200, doc);
+    });
+  })
+
+  app.get("/groups/:groupId/topics/:topicId/comments", function(req, res){
+    db.comments.find({ topicId: req.params.topicId }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.send(200, doc);
+    })
+  });
+
+  app.put("/groups/:groupId/topics/:topicId/comments", function(req, res){
+    db.comments.save({ userId: req.body.userId, content: req.body.content, topicId: req.params.topicId }, function(err, doc){
+      if(err){
+        res.status(500);
+        return;
+      }
+
+      res.send(201);
+    })
+  });
 };
