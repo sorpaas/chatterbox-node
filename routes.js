@@ -58,4 +58,15 @@ module.exports = function(app, db) {
       res.send(200, doc)
     });
   });
+
+  app.get("/groups", function(req, res){
+    db.groups.find({}, function(err, doc){
+      if(err) {
+        res.status(500);
+        return;
+      }
+
+      res.send(200, doc.map(function(x) { return { _id: x._id, name: x.name, description: x.description }}))
+    });
+  });
 };
