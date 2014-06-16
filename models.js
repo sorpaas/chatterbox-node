@@ -1,6 +1,6 @@
 var caminte = require('caminte');
 var Schema = caminte.Schema;
-var db = {}; //TODO add mongodb adapter
+var db = { driver: "memory" }; //TODO add mongodb adapter
 
 var schema = new Schema(db.driver, db);
 
@@ -44,3 +44,5 @@ User.prototype.groups = function(){
     return x.group;
   });
 }
+
+module.exports = schema;

@@ -12,7 +12,8 @@
     "express": "~3.4.6",
     "express-device": "~0.3.7",
     "mongojs": "^0.13.0",
-    "socket.io": "~0.9.16"
+    "socket.io": "~0.9.16",
+    "caminte": "0.0.20"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
