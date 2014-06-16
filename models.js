@@ -28,7 +28,7 @@ var Member = schema.define('Member', {});
 Group.hasMany(Topic, { as: 'topics', foreignKey: 'groupId' });
 Topic.belongsTo(Group, { as: 'group', foreignKey: 'groupId' });
 
-Group.hasMany(Member, { as: 'members', foreignKey: 'groupId'});
+Group.hasMany(Member, { as: 'members', foreignKey: 'groupId' });
 User.hasMany(Member, { as: 'members', foreignKey: 'userId' });
 Member.belongsTo(Group, { as: 'group', foreignKey: 'groupId' });
 Member.belongsTo(User, { as: 'user', foreignKey: 'userId' });
@@ -42,5 +42,5 @@ Group.prototype.users = function(){
 User.prototype.groups = function(){
   return this.members.map(function(x){
     return x.group;
-  })aa
+  });
 }
